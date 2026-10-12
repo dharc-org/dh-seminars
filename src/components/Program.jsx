@@ -98,6 +98,8 @@ function Session({ session }) {
 function Slot({ slot }) {
   const isKeynote = slot.type === 'keynote'
   const isBreak = slot.type === 'break'
+  const hasDetails = Boolean(slot.abstract || slot.bio)
+  const [open, setOpen] = useState(false)
 
   return (
     <div
@@ -114,9 +116,60 @@ function Slot({ slot }) {
           <span className="font-body text-sm uppercase tracking-wide text-text-muted">
             {slot.title}
           </span>
+        ) : hasDetails ? (
+          <>
+            {/* The whole header row is the toggle, so tapping the name opens it. */}
+            <button
+              type="button"
+              aria-expanded={open}
+              aria-controls={`${slot.id}-details`}
+              onClick={() => setOpen((v) => !v)}
+              className="group flex w-full items-center justify-between gap-4 text-left"
+            >
+              <span className="block">
+                <span className="block font-body text-lg font-medium leading-snug text-text-base">
+                  {slot.speaker}
+                </span>
+                <span className="mt-0.5 block font-body text-lg italic leading-snug text-text-muted">
+                  {slot.title}
+                </span>
+              </span>
+              <span
+                aria-hidden="true"
+                className="flex h-8 w-8 shrink-0 items-center justify-center text-4xl font-light leading-none text-text-base transition-colors group-hover:text-accent"
+              >
+                {open ? '−' : '+'}
+              </span>
+            </button>
+
+            {open && (
+              <div id={`${slot.id}-details`} className="mt-4 space-y-4">
+                {slot.abstract && (
+                  <div>
+                    <p className="mb-1 font-body text-xs font-bold uppercase tracking-widest text-accent">
+                      Abstract
+                    </p>
+                    <p className="font-body text-sm leading-relaxed text-text-muted">
+                      {slot.abstract}
+                    </p>
+                  </div>
+                )}
+                {slot.bio && (
+                  <div>
+                    <p className="mb-1 font-body text-xs font-bold uppercase tracking-widest text-accent">
+                      Short bio
+                    </p>
+                    <p className="font-body text-sm leading-relaxed text-text-muted">
+                      {slot.bio}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         ) : (
           <>
-            <span className="block font-body text-lg leading-snug text-text-base font-medium">
+            <span className="block font-body text-lg font-medium leading-snug text-text-base">
               {slot.speaker}
             </span>
             <span className="mt-0.5 block font-body text-lg italic leading-snug text-text-muted">
