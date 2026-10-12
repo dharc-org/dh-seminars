@@ -54,7 +54,8 @@ jobs:
           console.log(`Resolved edition: ${currentEdition.slug} (${currentEdition.year})`)
           EOF
 
-      # 4–9. Publish to gh-pages with archival of any previous edition.
+      # 4. Publish to gh-pages. Each edition lives in its own /<slug>/ folder and
+      #    the branch root is a redirect that always points at the current edition.
       - name: Publish to gh-pages
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -64,13 +65,21 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Fail fast if the slug could not be read — it guards every rm/cp below.
+          : "${SLUG:?edition slug is empty — check src/config/edition.js}"
+
           GHP=/tmp/gh-pages
           REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 
+          # This edition's absolute URL: host from the owner, path from repo + slug.
+          OWNER="$(echo "${GITHUB_REPOSITORY%%/*}" | tr '[:upper:]' '[:lower:]')"
+          REPO="${GITHUB_REPOSITORY##*/}"
+          EDITION_URL="https://${OWNER}.github.io/${REPO}/${SLUG}"
+          echo "Edition URL: ${EDITION_URL}/"
+
           rm -rf "$GHP"
 
-          # 4. Checkout the gh-pages branch into a separate directory.
-          #    If it does not exist yet (first ever deploy), start an orphan branch.
+          # Checkout gh-pages (or start an orphan branch on the very first deploy).
           if git ls-remote --exit-code --heads "$REMOTE" gh-pages >/dev/null 2>&1; then
             echo "Existing gh-pages branch found — cloning it."
             git clone --branch gh-pages --single-branch "$REMOTE" "$GHP"
@@ -82,64 +91,56 @@ jobs:
             git -C "$GHP" clean -fdx >/dev/null 2>&1 || true
           fi
 
-          # Determine which edition is currently live at the root, if any.
-          CURRENT_SLUG=""
-          if [ -f "$GHP/.edition-meta.json" ]; then
-            CURRENT_SLUG="$(jq -r '.slug // empty' "$GHP/.edition-meta.json")"
-          fi
-
-          # 5. Archive guard: refuse to overwrite an already-published edition
-          #    unless it is the edition currently live at the root and we are
-          #    intentionally redeploying it.
-          if [ -d "$GHP/archive/$SLUG" ] && [ "$CURRENT_SLUG" != "$SLUG" ]; then
-            echo "::error::Archive for '$SLUG' already exists. This edition has already been published. Update edition.js with the new edition's slug before deploying."
-            exit 1
-          fi
-
-          # 6. Root detection and redeploy logic.
-          if [ -f "$GHP/index.html" ]; then
-            if [ -f "$GHP/.edition-meta.json" ]; then
-              if [ "$CURRENT_SLUG" = "$SLUG" ]; then
-                echo "Redeploying the currently live edition '$SLUG'."
-                # Remove the old deployment at root while keeping .git and archive/.
-                find "$GHP" -mindepth 1 -maxdepth 1 \
-                  ! -name '.git' \
-                  ! -name 'archive' \
-                  -exec rm -rf -- {} +
-              else
-                PREV_SLUG="$CURRENT_SLUG"
-                if [ -z "$PREV_SLUG" ] || [ "$PREV_SLUG" = "null" ]; then
-                  echo "::error::.edition-meta.json at root is missing a valid slug."
-                  exit 1
-                fi
-                echo "Archiving previous edition '$PREV_SLUG' → archive/$PREV_SLUG/"
-                mkdir -p "$GHP/archive/$PREV_SLUG"
-                # Move everything at root EXCEPT the .git dir and the archive folder itself.
-                find "$GHP" -mindepth 1 -maxdepth 1 \
-                  ! -name '.git' \
-                  ! -name 'archive' \
-                  -exec mv {} "$GHP/archive/$PREV_SLUG/" \;
-              fi
-            else
-              echo "::error::Found a site at the root of gh-pages but no .edition-meta.json — cannot determine which slug to archive it under."
-              exit 1
+          # Clean the branch root: keep .git and every EDITION folder (a top-level
+          # directory that directly contains an index.html). This preserves past
+          # editions while dropping the root redirect, metadata and any leftovers
+          # from the previous root-based layout (assets/, data/, archive/, ...).
+          shopt -s dotglob nullglob
+          for entry in "$GHP"/*; do
+            name="$(basename "$entry")"
+            [ "$name" = ".git" ] && continue
+            if [ -d "$entry" ] && [ -f "$entry/index.html" ]; then
+              echo "Keeping existing edition: $name"
+              continue
             fi
-          else
-            echo "No existing edition at root — this will be the first edition published here."
-          fi
+            rm -rf -- "${entry:?}"
+          done
+          shopt -u dotglob nullglob
 
-          # 7. Copy the freshly built dist/ into the root of gh-pages.
-          cp -R "$GITHUB_WORKSPACE/dist/." "$GHP/"
+          # Replace this edition's folder with the freshly built site.
+          rm -rf "${GHP:?}/${SLUG:?}"
+          mkdir -p "$GHP/$SLUG"
+          cp -R "$GITHUB_WORKSPACE/dist/." "$GHP/$SLUG/"
 
-          # 8. Write the edition meta marker. Next year's deploy reads this to know
-          #    which slug to archive the now-current edition under.
+          # Inject the absolute edition URL where the placeholder appears
+          # (canonical, Open Graph, JSON-LD, sitemap, robots).
+          grep -rlZ --exclude-dir=assets '__SITE_URL__' "$GHP/$SLUG" 2>/dev/null \
+            | xargs -0 -r sed -i "s#__SITE_URL__#${EDITION_URL}#g" || true
+
+          # Write the root redirect that always points at the current edition.
+          cat > "$GHP/index.html" <<HTML
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <title>/DH.arc seminars</title>
+              <link rel="canonical" href="${EDITION_URL}/" />
+              <meta name="robots" content="noindex" />
+              <meta http-equiv="refresh" content="0; url=./${SLUG}/" />
+              <script>location.replace("./${SLUG}/" + location.hash)</script>
+            </head>
+            <body>
+              <p>Redirecting to the current edition… <a href="./${SLUG}/">Continue</a></p>
+            </body>
+          </html>
+          HTML
+
+          # Root housekeeping: disable Jekyll and record the current edition.
+          touch "$GHP/.nojekyll"
           jq -n --arg slug "$SLUG" --arg name "$NAME" --argjson year "$YEAR" \
             '{slug: $slug, name: $name, year: $year}' > "$GHP/.edition-meta.json"
 
-          # Disable Jekyll so files/folders are served verbatim.
-          touch "$GHP/.nojekyll"
-
-          # 9. Commit and push to gh-pages.
+          # Commit and push to gh-pages.
           cd "$GHP"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -149,5 +150,5 @@ jobs:
           else
             git commit -m "Deploy edition: $SLUG ($YEAR)"
             git push origin gh-pages
-            echo "Published edition '$SLUG' to gh-pages."
+            echo "Published '$SLUG' at ${EDITION_URL}/"
           fi

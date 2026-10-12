@@ -1,34 +1,34 @@
-# DH.arc seminars — website template
+# /DH.arc seminars — website template
 
-A production-ready, editorially-styled website for the **DH.arc seminars**, a recurring
-academic seminar series hosted by the DH.arc group at the University of Bologna. The
-first edition is **_From Knowledge to Practice_**.
+A production-ready, editorially-styled website for the **/DH.arc seminars**, a recurring
+academic seminar series hosted by the DH.arc group at the University of Bologna.
 
-The architecture is built for **annual reuse**: each new edition replaces the site root,
-while past editions are frozen into `/archive/<edition-slug>/` subfolders — all inside a
-single repository served from a single `gh-pages` branch.
+The architecture is built for **annual reuse**: each edition is published in its own
+`/<edition-slug>/` folder, and the site **root always redirects to the current edition** — all
+inside a single repository served from a single `gh-pages` branch.
 
 - **Stack:** React 18 + JavaScript + Tailwind CSS v3 + Vite
 - **No** React Router / client-side routing — one long anchor-scrolled page
 - **No** TypeScript
 - **Deployment:** GitHub Pages via a manually-triggered GitHub Actions workflow
 
-> The local folder is named `dharc-seminars-site`. The intended **repository** name is
-> `dharc-seminars` (the archive URLs in `src/config/editions.js` assume it). Rename the
-> folder if you like — only the GitHub repo name matters for the published URLs.
+> The published URLs are derived automatically from your **repo name** at deploy time (from
+> `GITHUB_REPOSITORY`), so you don't hardcode them anywhere. If the repo is `dharc-org/dharc-seminars`,
+> the current edition lives at `https://dharc-org.github.io/dharc-seminars/<slug>/` and the base
+> URL `https://dharc-org.github.io/dharc-seminars/` redirects to it.
 
 ---
 
 ## The one constraint you must never break: relative asset paths
 
 `vite.config.js` sets **`base: './'`**. This makes Vite emit **relative** asset paths
-(`./assets/index.js`, not `/assets/index.js`). It is the single most important setting in
-the project: without it, a build placed inside `/archive/from-knowledge-to-practice/` would
-request its assets from the domain root and break completely.
+(`./assets/index.js`, not `/assets/index.js`). It is the single most important setting in the
+project: because every edition is served from a **subfolder** (`/<slug>/`), an absolute path
+like `/assets/...` would request assets from the domain root and break the page completely.
 
 The same rule applies to data fetches: the program is loaded with
-`fetch('./data/program.json')` — **never** `'/data/program.json'`. Keep every asset
-reference relative.
+`fetch('./data/program.json')` — **never** `'/data/program.json'`. Keep every asset reference
+relative.
 
 ---
 
@@ -37,7 +37,6 @@ reference relative.
 Requires **Node 20+**.
 
 ```bash
-cd dharc-seminars-site
 npm install      # first time only
 npm run dev      # start the dev server (Vite prints a localhost URL)
 ```
@@ -53,16 +52,17 @@ npm run preview  # serve the built dist/ locally to sanity-check it
 
 | What | Where |
 | --- | --- |
-| Current edition metadata | `src/config/edition.js` |
+| Current edition metadata (name, **slug**, year) | `src/config/edition.js` |
 | Past editions (nav dropdown) | `src/config/editions.js` |
 | **Program schedule (only runtime data)** | `public/data/program.json` |
-| Hero image | `public/hero.jpg` |
+| Hero image | `public/hero.webp` |
+| Page `<head>`, SEO/Open Graph, Event JSON-LD | `index.html` |
 | **Theme — colors & fonts (retheme here)** | `src/styles/theme.css` |
 | All other copy (hero, about, committee, footer) | hardcoded in `src/components/*.jsx` |
 
 **Rethemeing:** change the CSS variables in `src/styles/theme.css` and nothing else.
-Components reference those variables through Tailwind tokens (`text-accent`,
-`font-heading`, …) or `var(--…)` — no component hardcodes a hex value or font name.
+Components reference those variables through Tailwind tokens (`text-accent`, `font-heading`, …)
+or `var(--…)` — no component hardcodes a hex value or font name.
 
 ---
 
@@ -70,40 +70,41 @@ Components reference those variables through Tailwind tokens (`text-accent`,
 
 The site deploys to the `gh-pages` branch and is served by GitHub Pages.
 
-1. **Create the GitHub repo** (recommended name: `dharc-seminars`) and push this project
-   to its **`main`** branch.
+1. **Create the GitHub repo** inside the organisation and push this project to its **`main`** branch.
 2. **Allow Actions to write to the repo:**
-   `Settings → Actions → General → Workflow permissions → Read and write permissions` →
-   Save. (The workflow already requests `contents: write`; this setting must also allow it.)
+   `Settings → Actions → General → Workflow permissions → Read and write permissions` → Save.
+   (The workflow requests `contents: write`; this per-repo setting must also allow it.)
 3. **Run the deploy workflow manually:**
-   `Actions` tab → **Deploy edition** → **Run workflow** → run on `main`.
-   This builds the site and pushes it to the `gh-pages` branch (creating that branch on the
-   first run).
+   `Actions` tab → **Deploy edition** → **Run workflow** → run on `main`. This builds the site,
+   publishes it into `/<slug>/`, writes the root redirect, and creates the `gh-pages` branch on
+   the first run.
 4. **Enable GitHub Pages:**
    `Settings → Pages → Build and deployment → Source: Deploy from a branch` →
    Branch: **`gh-pages`**, folder: **`/ (root)`** → Save.
-5. After a minute the site is live at
-   `https://<org-or-user>.github.io/dharc-seminars/`.
+5. After a minute the base URL `https://<org>.github.io/<repo>/` redirects to the current
+   edition at `https://<org>.github.io/<repo>/<slug>/`.
 
-> The workflow triggers on **`workflow_dispatch` only** — it never deploys automatically on
-> push. You consciously decide when to publish.
+> The workflow triggers on **`workflow_dispatch` only** — it never deploys automatically on push.
+> You consciously decide when to publish. The repo must be **public** for GitHub Pages on a
+> standard plan.
 
-### How the workflow archives editions (what happens on each run)
+### What the deploy workflow does (each run)
 
 1. Checks out `main`, runs `npm ci` and `npm run build` → `dist/`.
-2. Reads the current edition `slug` from `src/config/edition.js`.
+2. Reads the current edition `slug`, `name`, `year` from `src/config/edition.js`.
 3. Checks out the existing `gh-pages` branch (or starts a fresh one).
-4. **Archive guard:** if `archive/<current-slug>/` already exists, it **fails** with a clear
-   message — this edition was already published, so you must bump the slug first.
-5. **Root detection:** if a previous edition is live at the root, it reads that edition's
-   slug from `.edition-meta.json` and moves the entire root (except `archive/` and `.git`)
-   into `archive/<previous-slug>/`.
-6. Copies the new `dist/` into the root.
-7. Writes a fresh `.edition-meta.json` (`{ slug, name, year }`) — this is the breadcrumb the
-   *next* deploy uses to know how to archive the now-current edition.
+4. **Cleans the branch root**, keeping `.git` and every existing **edition folder** (any
+   top-level directory that contains an `index.html`). Past editions are preserved untouched.
+5. Replaces `/<slug>/` with the fresh `dist/` build.
+6. **Injects absolute URLs:** replaces the `__SITE_URL__` placeholder in the edition's
+   `index.html`, `sitemap.xml` and `robots.txt` with `https://<org>.github.io/<repo>/<slug>` —
+   so canonical, Open Graph, Twitter and Event JSON-LD URLs are always correct for this edition.
+7. Writes the **root redirect** `index.html` (meta-refresh + JS, `noindex`, canonical) pointing
+   at `./<slug>/`, plus `.nojekyll` and a `.edition-meta.json` marker.
 8. Commits and pushes `gh-pages`.
 
-You never edit the `gh-pages` branch by hand.
+You never edit the `gh-pages` branch by hand. Re-deploying the **same** slug simply rewrites
+that edition's folder (no "already published" error).
 
 ---
 
@@ -116,14 +117,14 @@ Do all of this on `main`, commit, then deploy.
 ```js
 export const currentEdition = {
   name: "The New Edition Title",
-  slug: "the-new-edition-title",   // ← MUST be new & unique (kebab-case). This is the archive key.
-  year: 2026,
-  seriesName: "DH.arc seminars",   // unchanged
+  slug: "the-new-edition-title",   // ← MUST be new & unique (kebab-case). This is the folder name.
+  year: 2027,
+  seriesName: "/DH.arc seminars",  // unchanged
 };
 ```
 
-⚠️ The `slug` **must change** every edition. If you forget, the deploy workflow’s archive
-guard stops you with an error rather than overwriting anything.
+⚠️ The `slug` **must change** every edition — it's the folder each edition lives in and the
+target the root redirect points to.
 
 ### b) `public/data/program.json` — replace the schedule (required)
 
@@ -132,74 +133,77 @@ Replace the contents with the new edition’s schedule. Schema:
 ```
 days[]              → date (e.g. "05.11.26") + sessions[]
   sessions[]        → label ("morning session") + theme ("…<LEARNING>") + slots[]
-    slots[]         → time, type, title, (speaker)
+    slots[]         → time, type, title, (speaker, abstract, bio)
 ```
 
 - `type` is one of:
-  - `"talk"` — `speaker` (regular) + `title` (italic)
-  - `"keynote"` — same fields, shown with an accent left-border + “Keynote” marker
+  - `"talk"` / `"keynote"` — `speaker` + `title` (keynote shows an accent left-border)
   - `"break"` — `title` only, muted (no `speaker`)
+- Add `abstract` and/or `bio` to a slot to give it an expandable **+/−** toggle in the program.
 - Give every `day`, `session`, and `slot` a unique `id`.
 
-Also update the hero/about/committee/footer copy in `src/components/*.jsx` and swap
-`public/hero.jpg` if the new edition has its own artwork. Retheme via
-`src/styles/theme.css` if you want a new color/typography identity.
+### c) `index.html` — refresh the page metadata (recommended)
 
-### c) `src/config/editions.js` — add the edition you’re *replacing* (timing matters)
+Update the `<title>`, description, Open Graph/Twitter text, and the Event **JSON-LD** (dates,
+location, speakers). The **absolute URLs auto-fill at deploy** via `__SITE_URL__`, so you only
+change the *content*, not the links.
 
-This file powers the **Previous Editions** dropdown. Add **one entry for the edition that is
-currently live** — i.e. the one this deploy is about to archive.
+Also update the hero/about/committee/footer copy in `src/components/*.jsx`, swap
+`public/hero.webp` for new artwork, and retheme via `src/styles/theme.css` if desired.
 
-**When:** do this in the *same commit* as the new edition, **before** you deploy. The entry
-points at the URL the about-to-be-archived edition will have once this deploy archives it:
+### d) `src/config/editions.js` — add the edition you’re *replacing*
+
+This powers the **Previous Editions** dropdown. Add **one entry for the now-outgoing edition**,
+pointing at its own in-repo slug URL (newest-first):
 
 ```js
 export const pastEditions = [
   {
-    name: "From Knowledge to Practice",
-    slug: "from-knowledge-to-practice",
-    year: 2025,
-    url: "https://<org-or-user>.github.io/dharc-seminars/archive/from-knowledge-to-practice/",
+    name: "From thought to practice",
+    slug: "from-thought-to-practice",
+    year: 2026,
+    url: "https://<org>.github.io/<repo>/from-thought-to-practice/",
   },
   // older editions stay here too, newest-first
 ];
 ```
 
-If `pastEditions` is empty, the dropdown is hidden entirely (as it is for the very first
-edition).
+If `pastEditions` is empty, the dropdown is hidden entirely.
 
-> **Special case — the 2025 edition lives in another repo.** The 2025 edition
-> (*Building Knowledge Landscapes Across the Digital Humanities*) was published from a separate
-> repository and is already live at its own GitHub Pages URL, so its `editions.js` entry links
-> **directly to that external URL** rather than to an `/archive/` folder in this repo. This is a
-> one-off hardcoded link and it does not affect the archival flow: every future edition is still
-> archived into this repo's `/archive/<slug>/` and added here with its in-repo URL, newest-first,
-> alongside the hardcoded 2025 entry.
+> **Special case — the 2025 edition lives in another repo.** *Building Knowledge Landscapes
+> Across the Digital Humanities* was published from a separate repository and is already live at
+> its own GitHub Pages URL, so its `editions.js` entry links **directly to that external URL**.
+> It's a one-off hardcoded link and does not affect the normal flow.
 
-### d) Deploy
+### e) Deploy
 
-`Actions → Deploy edition → Run workflow` on `main`. The workflow archives the previous
-edition automatically and publishes the new one at the root.
+`Actions → Deploy edition → Run workflow` on `main`. The new edition is published at `/<slug>/`,
+every past edition folder is preserved, and the **root redirect automatically updates** to point
+at the new edition.
 
 ### Quick recap
 
 | Step | File | Action |
 | --- | --- | --- |
 | 1 | `src/config/edition.js` | New `name`, **new unique `slug`**, new `year` |
-| 2 | `public/data/program.json` | New schedule |
-| 3 | `src/components/*.jsx`, `public/hero.webp`, `src/styles/theme.css` | New copy / image / theme (optional) |
-| 4 | `src/config/editions.js` | Add the edition being replaced (before deploy) |
-| 5 | — | Run **Deploy edition** workflow manually |
+| 2 | `public/data/program.json` | New schedule (optionally with `abstract`/`bio`) |
+| 3 | `index.html` | Refresh title / description / Event JSON-LD content |
+| 4 | `src/components/*.jsx`, `public/hero.webp`, `src/styles/theme.css` | New copy / image / theme (optional) |
+| 5 | `src/config/editions.js` | Add the edition being replaced (with its `/<slug>/` URL) |
+| 6 | — | Run **Deploy edition** workflow manually |
 
 ---
 
 ## Project structure
 
 ```
-dharc-seminars-site/
+.
 ├── public/
 │   ├── data/program.json        # the only runtime data file
-│   └── hero.webp                # hero background image
+│   ├── hero.webp                # hero background image
+│   ├── favicon.svg  apple-touch-icon.png  og-image.jpg
+│   ├── logos/                   # centre / partner logos
+│   ├── robots.txt  sitemap.xml  # __SITE_URL__ is injected at deploy
 ├── src/
 │   ├── config/
 │   │   ├── edition.js           # current edition metadata
@@ -208,9 +212,21 @@ dharc-seminars-site/
 │   │   ├── Nav.jsx  Hero.jsx  About.jsx  Program.jsx  Committee.jsx  Footer.jsx
 │   ├── styles/theme.css         # CSS custom properties — the single place to retheme
 │   ├── App.jsx  main.jsx  index.css
-├── .github/workflows/deploy.yml # manual deploy + archival
+├── index.html                   # <head>, SEO, Event JSON-LD (uses __SITE_URL__)
+├── .github/workflows/deploy.yml # manual deploy: /<slug>/ + root redirect
 ├── vite.config.js               # base: './'  (non-negotiable)
 ├── tailwind.config.js
 ├── postcss.config.js
 └── package.json
+```
+
+### gh-pages layout
+
+```
+gh-pages/
+├── index.html                       # redirect → current edition
+├── .edition-meta.json               # { slug, name, year } of the current edition
+├── from-thought-to-practice/        # the 2026 edition (self-contained build)
+│   ├── index.html  assets/  data/  hero.webp  og-image.jpg  sitemap.xml  …
+└── <future-slug>/                   # each future edition, preserved across deploys
 ```

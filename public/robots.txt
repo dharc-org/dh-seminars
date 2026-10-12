@@ -1,5 +1,5 @@
-# DH.arc seminars — https://dharc-org.github.io/dh-seminars/
+# /DH.arc seminars
 User-agent: *
 Allow: /
 
-Sitemap: https://dharc-org.github.io/dh-seminars/sitemap.xml
+Sitemap: __SITE_URL__/sitemap.xml

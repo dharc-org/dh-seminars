@@ -1,13 +1,13 @@
 // Past editions for the "Previous Editions" nav dropdown.
 //
-// Normally you add one entry here each time an edition is archived, pointing at
-// its in-repo URL: https://<org>.github.io/dharc-seminars/archive/<slug>/
+// Each edition is published in its own folder, so a past edition's URL is simply
+// its in-repo slug URL: https://<org>.github.io/<repo>/<slug>/
+// Add one entry here when you launch a new edition (pointing at the edition you
+// are replacing), newest-first. The site root always redirects to the current
+// edition, so you never link to the bare root here.
 //
-// The 2025 edition is a SPECIAL hardcoded case: it lived in a separate repo and
-// is already published at its own GitHub Pages URL, so we link to it directly
-// rather than to an /archive/ folder in this repo. This coexists fine with the
-// normal flow — future editions are archived into this repo's /archive/ and added
-// below with their in-repo URLs, newest-first.
+// The 2025 edition is a SPECIAL hardcoded case: it lives in a separate repo and
+// is already published at its own GitHub Pages URL, so we link to it directly.
 //
 // If this array is empty, the dropdown is hidden entirely.
 export const pastEditions = [
