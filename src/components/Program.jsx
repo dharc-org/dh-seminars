@@ -99,6 +99,7 @@ function Slot({ slot }) {
   const isKeynote = slot.type === 'keynote'
   const isBreak = slot.type === 'break'
   const hasDetails = Boolean(slot.abstract || slot.bio)
+  const hasInfo = Boolean(slot.requirements || slot.schedule)
   const [open, setOpen] = useState(false)
 
   return (
@@ -175,6 +176,41 @@ function Slot({ slot }) {
             <span className="mt-0.5 block font-body text-lg italic leading-snug text-text-muted">
               {slot.title}
             </span>
+
+            {hasInfo && (
+              <div className="mt-4 space-y-4">
+                {slot.requirements && (
+                  <div>
+                    <p className="mb-1 font-body text-xs font-bold uppercase tracking-widest text-accent">
+                      Requirements
+                    </p>
+                    <p className="font-body text-sm leading-relaxed text-text-muted">
+                      {slot.requirements}
+                    </p>
+                  </div>
+                )}
+                {slot.schedule && (
+                  <div>
+                    <p className="mb-2 font-body text-xs font-bold uppercase tracking-widest text-accent">
+                      Programme
+                    </p>
+                    <dl className="space-y-3">
+                      {slot.schedule.map((item) => (
+                        <div key={item.time} className="sm:grid sm:grid-cols-[8rem_1fr] sm:gap-x-6">
+                          <dt className="mb-0.5 font-body text-sm tabular-nums text-text-muted sm:mb-0">
+                            {item.time}
+                          </dt>
+                          <dd className="font-body text-sm leading-relaxed text-text-muted">
+                            <span className="font-medium text-text-base">{item.label}.</span>{' '}
+                            {item.text}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                )}
+              </div>
+            )}
           </>
         )}
       </dd>
