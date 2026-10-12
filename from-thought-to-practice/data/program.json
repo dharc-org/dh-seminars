@@ -137,7 +137,20 @@
               "time": "9:00 - 13:00",
               "type": "keynote",
               "speaker": "Forge Your Personal AI Stack",
-              "title": "A Laboratory for Advanced RAG with Self-Hosted LLMs"
+              "title": "A Laboratory for Advanced RAG with Self-Hosted LLMs",
+              "requirements": "Familiarity with Python is required; no prior experience with large language models is needed.",
+              "schedule": [
+                {
+                  "time": "9:00 to 12:00",
+                  "label": "Laboratory",
+                  "text": "Participants build and evaluate an advanced RAG pipeline with locally hosted language models. Ahead of the event, registered participants receive instructions and a guide to download a local LLM suited to their own hardware, so that everything is ready and no time is lost getting started."
+                },
+                {
+                  "time": "12:00 to 13:00",
+                  "label": "Use case",
+                  "text": "Hands on session with a live demo of Relay."
+                }
+              ]
             }
           ]
         }
