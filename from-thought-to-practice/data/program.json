@@ -1,0 +1,147 @@
+{
+  "days": [
+    {
+      "id": "day-1",
+      "date": "05.11.26",
+      "sessions": [
+        {
+          "id": "s1-morning",
+          "label": "morning session",
+          "theme": "EXPERT DIALOGUES <LEARNING>",
+          "slots": [
+            {
+              "id": "sl-1-1",
+              "time": "10:00 - 10:10",
+              "type": "break",
+              "title": "Welcome & Opening Remarks"
+            },
+            {
+              "id": "sl-1-2",
+              "time": "10:10 - 10:20",
+              "type": "keynote",
+              "speaker": "Prof. Francesca Tomasi and Prof. Giovanni Colavizza",
+              "title": "Introduction: DH and AI"
+            },
+            {
+              "id": "sl-1-3",
+              "time": "10:20 - 11:00",
+              "type": "keynote",
+              "speaker": "Dr. Enrico Daga",
+              "title": "From Data Façades to the Ontological Continuum: Diversity in Humanities Knowledge Graphs",
+              "abstract": "Humanities knowledge graphs are diverse by necessity. Archives, museums and scholarly projects model their sources with different vocabularies, granularities and commitments, from lightweight metadata to richly axiomatised ontologies such as CIDOC-CRM. Each choice reflects a community, a research question, and an interpretive stance. This diversity is an asset, yet it hampers integration and reuse. In this talk, I reflect on two answers to this tension. Data façades, and Façade-X in particular, take a minimalist route: heterogeneous sources are accessed as knowledge graphs with the least possible ontological commitment, postponing modelling decisions to the moment of use. The ontological continuum generalises this intuition. Rather than prescribing a single model, it characterises knowledge graphs by their semantic and pragmatic properties and affordances, making transformations between them explicit. I will argue that such a framework is essential for AI, and particularly LLMs, to engage with humanities knowledge without flattening its plurality.",
+              "bio": "Enrico Daga is a Senior Research Fellow at the Knowledge Media Institute of The Open University (UK). His research explores methods for knowledge graph construction and data integration, with a focus on data management, process knowledge, and the reuse of heterogeneous sources. He develops SPARQL Anything, an open-source system implementing the Façade-X approach to querying non-RDF data, and co-chairs the W3C Data Façades Community Group. He has worked on several European projects in cultural heritage and digital humanities, including Polifonia and SPICE, and applies his expertise to scientific, civic, and cultural data."
+            },
+            {
+              "id": "sl-1-4",
+              "time": "11:00 - 11:30",
+              "type": "break",
+              "title": "Coffee Break"
+            },
+            {
+              "id": "sl-1-5",
+              "time": "11:30 - 12:10",
+              "type": "keynote",
+              "speaker": "Dr. Eva Cetinić",
+              "title": "Challenges of Evaluating Visual Generative AI Models as Cultural Objects",
+              "abstract": "While AI models have traditionally been considered tools that can be applied to specific tasks, with certain potentials and limitations, in recent years we have witnessed a paradigmatic shift in how AI technologies are approached within the Digital Humanities. They are no longer understood merely as tools, but are increasingly becoming objects of study in their own right. With the widespread integration of AI, scholars in the (digital) arts and humanities have become increasingly interested in critically examining these technologies and the broader implications of their use. Particularly relevant in the context of DH is the growing awareness that AI models are not only technical but also cultural objects. But what does it mean in practice to study and explore their cultural aspects in a systematic way? This talk will discuss these challenges, with a particular focus on evaluating visual generative AI in relation to questions of bias, implicit representations and memorization.",
+              "bio": "Eva Cetinić is a senior researcher at the Institute of Art History, University of Zurich (UZH), where she is currently leading the project “The Canon of Latent Spaces: How Large AI Models Encode Art and Culture”, funded by an Ambizione grant from the Swiss National Science Foundation. Before that, she held postdoctoral positions at the University of Zurich’s Digital Society Initiative and Center for Digital Visual Studies, and previously worked as a postdoctoral researcher in Digital Humanities and Machine Learning at Durham University in the UK. She received her Ph.D. degree in Computer Science from the Faculty of Electrical Engineering and Computing, University of Zagreb. She has been working at the intersection of AI and art for more than a decade, mainly exploring how computer vision and deep learning methods can be used for computational analysis of artworks. Her current research interests focus on investigating the cultural, ethical, and societal implications of multimodal generative AI models."
+            },
+            {
+              "id": "sl-1-6",
+              "time": "12:10 - 12:50",
+              "type": "keynote",
+              "speaker": "Dr. Lise Stork",
+              "title": "Who Does What? Human–LLM Knowledge Engineering in Digital Humanities",
+              "abstract": "Making scholarly knowledge machine-readable is challenging because much of what researchers know is never written down: how to interpret an image, which subtleties matter when comparing sources. It requires close collaboration between subject matter experts, who understand the material, and engineers, who know how to formalise that knowledge. Large language models, due to their capabilities in manipulating and generating language at scale, offer new possibilities for joining the knowledge engineering workflow, but lack much of the specialised and contextual knowledge required for humanities research. Drawing on three editions of the SemDH workshops and my recent work on human–LLM knowledge engineering workflows, I will examine how established challenges persist or shift when LLMs enter the workflow. This leads to a central question: how should tasks, expertise, and oversight be distributed in human–LLM workflows so that the resulting knowledge remains meaningful, reusable, and trustworthy?",
+              "bio": "Lise Stork is an Assistant Professor in the Intelligent Data Engineering Lab (INDELab) at the University of Amsterdam, where she joined as a MacGillavry Fellow in 2024. Her research sits at the intersection of knowledge engineering, hybrid AI, and e-Science, focusing on human-AI systems that help scholars and researchers make their data and findings machine-readable for reuse and reproducibility, with applications in digital humanities, social history, and biodiversity research. She is a member of the Hybrid Intelligence Center, co-organiser of the SemDH workshop, and has participated in projects including EU Horizon 2020 MUHAI and NWO Making Sense."
+            },
+            {
+              "id": "sl-1-7",
+              "time": "12:50 - 13:00",
+              "type": "break",
+              "title": "Wrap up"
+            },
+            {
+              "id": "sl-1-8",
+              "time": "13:00 - 14:30",
+              "type": "break",
+              "title": "Lunch Break"
+            }
+          ]
+        },
+        {
+          "id": "s1-afternoon",
+          "label": "afternoon session",
+          "theme": "USE-CASE PRESENTATIONS <SHARING>",
+          "slots": [
+            {
+              "id": "sl-2-1",
+              "time": "14:30 - 14:40",
+              "type": "break",
+              "title": "Session Introduction"
+            },
+            {
+              "id": "sl-2-2",
+              "time": "14:40 - 15:20",
+              "type": "keynote",
+              "speaker": "Tiago Filipe Nunes Ribeiro",
+              "title": "Historical Person Register (HisPeR)",
+              "abstract": "HisPeR is a national research infrastructure at the Danish National Archives (Rigsarkivet). It extends the modern Danish Civil Registration System (CPR) backwards in time, linking approximately 100 million personal records from 1645 to the present and enabling the reconstruction of life courses and family relations across up to 15 generations. The project combines historical research methods with deep learning: link models are trained on a curated sample of transcribed parish records, censuses, and burial registers, then generalised across the full corpus. HisPeR builds directly on Link-Lives (2019–2024), which established linked life courses for 1787–1968 and made the subset 1787–1901 publicly searchable. It extends this framework further into the past and to the present, incorporating modern CPR data. The project is designed to be a permanent, expandable data service, continuously enriched with new data from donated sources. Its main goal is to support research into Danish society across four centuries in areas such as health, migration and education.",
+              "bio": "Tiago Ribeiro is a Data Scientist at the University of Copenhagen’s Centre for Digital and Computational Humanities (CDCH). His work focuses on large language models and NLP, with a particular interest in cognitive science and AI explainability methods, making outputs more transparent for human decision-making. He is a full-stack developer behind Relay, a private AI platform that helps users explore large collections of documents and retrieve grounded, verifiable answers. His work sits at the intersection of LLM applications, computational methods and human-centered design of tools that support human reasoning."
+            },
+            {
+              "id": "sl-2-3",
+              "time": "15:20 - 16:00",
+              "type": "keynote",
+              "speaker": "Selda Eren",
+              "title": "FREE: Schema-Guided Information Extraction from Documents",
+              "abstract": "Extracting structured information from documents is a common challenge across many domains, particularly when relevant information is embedded in narrative text, tables, or varied document formats. In this presentation, I introduce FREE, a general-purpose tool developed at the Centre for Digital and Computational Humanities for schema-guided, evidence-grounded information extraction using large language models. Through a familiar chat interface, users can describe their extraction requirements in natural language, and FREE translates those requirements into a structured schema. The tool then extracts the requested information and links each extracted value to supporting evidence in the source document, enabling users to inspect and validate the results. I will demonstrate the workflow using an archaeological catalogue as a practical use case.",
+              "bio": "Selda Eren is a Senior Data Scientist at the Centre for Digital and Computational Humanities (CDCH), University of Copenhagen. With a PhD in Cognitive Science, she works at the intersection of artificial intelligence and the humanities, developing computational approaches to information extraction and document processing. She collaborates with researchers across disciplines to transform complex research questions into practical workflows and tools. She also leads the development of FREE, an evidence-grounded environment designed to make information extraction transparent, adaptable, and accessible across diverse research domains."
+            },
+            {
+              "id": "sl-2-4",
+              "time": "16:00 - 16:30",
+              "type": "break",
+              "title": "Coffee Break"
+            },
+            {
+              "id": "sl-2-5",
+              "time": "16:30 - 17:10",
+              "type": "keynote",
+              "speaker": "Yevhenii Osadchuk",
+              "title": "Relay – Reliable AI Assistant for Research",
+              "abstract": "Researchers and students increasingly need to search vast document collections in natural language, but generic AI chatbots weren’t built for that task. They hallucinate references, miss sources, and simply can’t be trusted with scholarly work. Relay is built to close that gap: a semi-agentic, locally deployed AI that generates grounded responses with transparent citations. Relay combines hybrid retrieval and intent-aware routing, so the system adapts its next steps depending on the question asked. Every answer is supported by per-sentence citation verification and hallucination scoring, so users don’t just get an answer, they get an answer they can check, trust and verify. Relay achieved 40.6% accuracy on the AIR-QA dataset, compared with 22.1% for its standard RAG baseline and 39.61% for its GPT-4o-based agentic method. This approaches AIR-QA’s best reported result of 41.71%, achieved with up to 20 reasoning cycles and database access. Relay ran entirely on locally hosted, open-weight models using a single planning step.",
+              "bio": "Yevhenii Osadchuk, Ph.D., is a machine learning engineer at the University of Copenhagen’s Centre for Digital and Computational Humanities. His work focuses on large language models, information retrieval, and trustworthy AI for research and industry. He is part of the team developing Relay, a private AI platform that helps users explore large document collections and find answers grounded in verifiable sources. His interests include retrieval-augmented generation, agentic AI workflows, and practical approaches to improving the reliability, transparency, and privacy of AI systems."
+            },
+            {
+              "id": "sl-2-6",
+              "time": "17:10 - 17:30",
+              "type": "break",
+              "title": "Wrap up"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "day-2",
+      "date": "06.11.26",
+      "sessions": [
+        {
+          "id": "s2-workshop",
+          "label": "workshop",
+          "theme": "WORKSHOP <DOING>",
+          "slots": [
+            {
+              "id": "sl-3-1",
+              "time": "9:00 - 13:00",
+              "type": "keynote",
+              "speaker": "Forge Your Personal AI Stack",
+              "title": "A Laboratory for Advanced RAG with Self-Hosted LLMs"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

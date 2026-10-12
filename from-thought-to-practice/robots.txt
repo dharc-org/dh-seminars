@@ -1,0 +1,5 @@
+# /DH.arc seminars
+User-agent: *
+Allow: /
+
+Sitemap: https://dharc-org.github.io/dharc-seminars/from-thought-to-practice/sitemap.xml
