@@ -37,7 +37,7 @@ export default function Hero() {
           </p>
 
           <p className="mb-4 font-body text-sm text-text-muted">
-            5–6 November 2026 — Aula Affreschi, via Zamboni 34, Bologna
+            5-6 November 2026 <br/> Aula 3, Via Zamboni 32 - Aula Affreschi, via Zamboni 34, Bologna
           </p>
 
 {/*           <p className="max-w-md font-body text-lg leading-relaxed text-text-base">
